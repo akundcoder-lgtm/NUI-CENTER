@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Center</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f111a;
+      color: #fff;
+    }
+    header {
+      background: #121420;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1c1f2e;
+    }
+    header .logo {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4fa3ff;
+    }
+    .profile-icon {
+      font-size: 22px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #181b29;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #4fa3ff;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: 14px;
+      margin-top: 10px;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-green { background: #1db954; }
+    .btn-red { background: #e74c3c; }
+    .btn-blue { background: #4fa3ff; }
+    /* Popup */
+    .popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .popup-content {
+      background: #181b29;
+      padding: 20px;
+      border-radius: 10px;
+      width: 400px;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .popup h2 {
+      margin-top: 0;
+      color: #4fa3ff;
+    }
+    .input-group {
+      margin: 10px 0;
+    }
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+      background: #0f111a;
+      color: #fff;
+    }
+    .file-list {
+      margin-top: 15px;
+    }
+    .file-item {
+      background: #0f111a;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .close-btn {
+      float: right;
+      font-size: 18px;
+      cursor: pointer;
+      color: #aaa;
+    }
+    .info-section {
+      background: #181b29;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 30px;
+      text-align: center;
+    }
+    .info-section h2 {
+      color: #4fa3ff;
+    }
+    .info-section p {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">FILE NUI RADIAN</div>
+    <div class="profile-icon" onclick="openPopup('loginPopup')">🌐</div>
+  </header>
+
+  <div class="container">
+    <div class="grid" id="fileGrid"></div>
+
+    <!-- Informasi Section -->
+    <div class="info-section" id="infoSection" style="display:none;">
+      <h2 id="infoTitle">🌐 INFORMASI</h2>
+      <p id="infoDesc"></p>
+      <a id="infoLink" href="#" class="btn btn-green" target="_blank">🛒 ORDER NOW</a>
+    </div>
+  </div>
+
+  <!-- Login Popup -->
+  <div class="popup" id="loginPopup">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup('loginPopup')">&times;</span>
+      <h2>Login</h2>
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password">
+      </div>
+      <button class="btn btn-blue" onclick="login()">Login</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Popup -->
+  <div class="popup" id="dashboardPopup">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup('dashboardPopup')">&times;</span>
+      <h2>Dashboard</h2>
+
+      <h3>Kelola File</h3>
+      <div class="input-group">
+        <label>Judul File</label>
+        <input type="text" id="fileTitle">
+      </div>
+      <div class="input-group">
+        <label>Deskripsi</label>
+        <textarea id="fileDesc"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Link Download</label>
+        <input type="text" id="fileLink">
+      </div>
+      <button class="btn btn-green" onclick="addFile()">Tambah File</button>
+      <h3>Kelola Password</h3>
+      <div class="input-group">
+        <label>Password Baru (Manual)</label>
+        <input type="text" id="newPassword">
+      </div>
+      <button class="btn btn-blue" onclick="updatePassword()">Update Password</button>
+      <button class="btn btn-red" onclick="resetPassword()">Reset Password Random</button>
+
+      <h3>🌐 INFORMASI</h3>
+      <div class="input-group">
+        <label>Judul Informasi</label>
+        <input type="text" id="infoTitleInput" placeholder="🌐 INFORMASI">
+      </div>
+      <div class="input-group">
+        <label>Deskripsi</label>
+        <textarea id="infoDescInput" placeholder="Tulis informasi di sini"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Link (URL)</label>
+        <input type="text" id="infoLinkInput" placeholder="https://contoh.com">
+      </div>
+      <button class="btn btn-blue" onclick="saveInfo()">Simpan Informasi</button>
+    </div>
+  </div>
+
+  <script>
+    let files = [];
+    let currentPassword = localStorage.getItem('password') || '1234';
+
+    function openPopup(id) {
+      document.getElementById(id).style.display = "flex";
+    }
+    function closePopup(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user === "admin" && pass === currentPassword) {
+        closePopup('loginPopup');
+        openPopup('dashboardPopup');
+      } else {
+        alert("Username atau password salah!");
+      }
+    }
+
+    function updatePassword() {
+      const newPass = document.getElementById("newPassword").value;
+      if (newPass) {
+        currentPassword = newPass;
+        localStorage.setItem('password', currentPassword);
+        alert("Password berhasil diubah!");
+        document.getElementById("newPassword").value = "";
+      } else {
+        alert("Masukkan password baru!");
+      }
+    }
+
+    function resetPassword() {
+      if (confirm("Yakin reset password random?")) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let randomPass = "";
+        for (let i = 0; i < 8; i++) {
+          randomPass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        currentPassword = randomPass;
+        localStorage.setItem('password', currentPassword);
+        alert("Password baru: " + randomPass);
+      }
+    }
+
+    function addFile() {
+      const title = document.getElementById("fileTitle").value;
+      const desc = document.getElementById("fileDesc").value;
+      const link = document.getElementById("fileLink").value;
+
+      if (!title || !link) {
+        alert("Judul dan link wajib diisi!");
+        return;
+      }
+
+      files.push({ title, desc, link });
+      renderFiles();
+      renderDashboard();
+      document.getElementById("fileTitle").value = "";
+      document.getElementById("fileDesc").value = "";
+      document.getElementById("fileLink").value = "";
+    }
+
+    function deleteFile(index) {
+      files.splice(index, 1);
+      renderFiles();
+      renderDashboard();
+    }
+
+    function renderFiles() {
+      const grid = document.getElementById("fileGrid");
+      grid.innerHTML = "";
+      files.forEach((f, i) => {
+        grid.innerHTML += `
+          <div class="card">
+            <h3>${f.title}</h3>
+            <p>${f.desc}</p>
+            <a href="${f.link}" class="btn btn-green" target="_blank">⬇ Download</a>
+          </div>
+        `;
+      });
+    }
+
+    function renderDashboard() {
+      const list = document.getElementById("fileList");
+      list.innerHTML = "";
+      files.forEach((f, i) => {
+        list.innerHTML += `
+          <div class="file-item">
+            <span>${f.title}</span>
+            <button class="btn btn-red" onclick="deleteFile(${i})">Hapus</button>
+          </div>
+        `;
+      });
+    }
+
+    function saveInfo() {
+      const title = document.getElementById("infoTitleInput").value || "🌐 INFORMASI";
+      const desc = document.getElementById("infoDescInput").value;
+      const link = document.getElementById("infoLinkInput").value;
+
+      if (!desc || !link) {
+        alert("Deskripsi dan link wajib diisi!");
+        return;
+      }
+
+      localStorage.setItem('infoTitle', title);
+      localStorage.setItem('infoDesc', desc);
+      localStorage.setItem('infoLink', link);
+
+      renderInfo();
+      alert("Informasi berhasil disimpan!");
+    }
+
+    function renderInfo() {
+      const title = localStorage.getItem('infoTitle');
+      const desc = localStorage.getItem('infoDesc');
+      const link = localStorage.getItem('infoLink');
+
+      if (desc && link) {
+        document.getElementById("infoSection").style.display = "block";
+        document.getElementById("infoTitle").textContent = title;
+        document.getElementById("infoDesc").textContent = desc;
+        document.getElementById("infoLink").href = link;
+      }
+    }
+
+    window.onload = function() {
+      renderInfo();
+    }
+  </script>
+</body>
+</html>
